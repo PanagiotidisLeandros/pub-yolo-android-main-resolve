@@ -2,6 +2,7 @@ package org.tensorflow.lite.examples.objectdetection
 
 import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.Canvas
 import android.os.SystemClock
 import org.tensorflow.lite.DataType
 import org.tensorflow.lite.Interpreter
@@ -16,6 +17,8 @@ import org.tensorflow.lite.support.tensorbuffer.TensorBuffer
 import org.tensorflow.lite.examples.objectdetection.MetaData.extractNamesFromLabelFile
 import org.tensorflow.lite.examples.objectdetection.MetaData.extractNamesFromMetadata
 import java.nio.ByteBuffer
+import kotlin.math.min
+import kotlin.math.roundToInt
 
 class InstanceSegmentation(
     context: Context,
@@ -106,7 +109,9 @@ class InstanceSegmentation(
 
         var preProcessTime = SystemClock.uptimeMillis()
 
-        val imageBuffer = preProcess(frame)
+        val preProcessResult = preProcess(frame)
+        val imageBuffer = preProcessResult.buffer
+
 
         val coordinatesBuffer = TensorBuffer.createFixedSize(
             intArrayOf(1 , numChannel, numElements),
@@ -117,7 +122,7 @@ class InstanceSegmentation(
             if (isMaskChannelsFirst) {
                 intArrayOf(1, masksNum, yPoints, xPoints)
             } else {
-                intArrayOf(1, xPoints, xPoints, masksNum)
+                intArrayOf(1, yPoints, xPoints, masksNum)
             },
             OUTPUT_IMAGE_TYPE
         )
@@ -145,9 +150,10 @@ class InstanceSegmentation(
         val maskProto = reshapeMaskOutput(maskProtoBuffer.floatArray)
 
         val segmentationResults = bestBoxes.map { box ->
+            val adjustedBox = adjustBoxToOriginal(box, frame.width, frame.height, preProcessResult.letterboxInfo)
             SegmentationResult(
-                box = box,
-                mask = getFinalMask(frame.width, frame.height, box, maskProto)
+                box = adjustedBox,
+                mask = getFinalMask(frame.width, frame.height, box, maskProto, preProcessResult.letterboxInfo)
             )
         }
 
@@ -165,7 +171,8 @@ class InstanceSegmentation(
         width: Int,
         height: Int,
         output0: Output0,
-        output1: List<Array<FloatArray>>
+        output1: List<Array<FloatArray>>,
+        letterboxInfo: LetterboxInfo
     ): Array<FloatArray> {
         val output1Copy = output1.clone()
         val relX1 = output0.x1 * xPoints
@@ -185,7 +192,20 @@ class InstanceSegmentation(
             }
         }
 
-        return zero.scaleMask(width , height)
+        val protoScaleX = xPoints.toFloat() / tensorWidth
+        val protoScaleY = yPoints.toFloat() / tensorHeight
+        val padXProto = (letterboxInfo.padX * protoScaleX).roundToInt()
+        val padYProto = (letterboxInfo.padY * protoScaleY).roundToInt()
+        val contentWidth = xPoints - padXProto * 2
+        val contentHeight = yPoints - padYProto * 2
+
+        val cropped = Array(contentHeight) { y ->
+            FloatArray(contentWidth) { x ->
+                zero[y + padYProto][x + padXProto]
+            }
+        }
+
+        return cropped.scaleMask(width , height)
     }
 
 
@@ -299,13 +319,90 @@ class InstanceSegmentation(
         return intersectionArea / (box1Area + box2Area - intersectionArea)
     }
 
-    private fun preProcess(frame: Bitmap): Array<ByteBuffer> {
-        val resizedBitmap = Bitmap.createScaledBitmap(frame, tensorWidth, tensorHeight, false)
+    private fun preProcess(frame: Bitmap): PreProcessResult {
+        val scale = min(
+            tensorWidth.toFloat() / frame.width.toFloat(),
+            tensorHeight.toFloat() / frame.height.toFloat()
+        )
+
+        val resizedWidth = (frame.width * scale).roundToInt()
+        val resizedHeight = (frame.height * scale).roundToInt()
+
+        val padX = (tensorWidth - resizedWidth) / 2f
+        val padY = (tensorHeight - resizedHeight) / 2f
+
+        val resizedBitmap = Bitmap.createScaledBitmap(frame, resizedWidth, resizedHeight, false)
+        val paddedBitmap = Bitmap.createBitmap(tensorWidth, tensorHeight, Bitmap.Config.ARGB_8888)
+        val canvas = Canvas(paddedBitmap)
+        canvas.drawBitmap(resizedBitmap, padX, padY, null)
+
         val tensorImage = TensorImage(INPUT_IMAGE_TYPE)
-        tensorImage.load(resizedBitmap)
+        tensorImage.load(paddedBitmap)
         val processedImage = imageProcessor.process(tensorImage)
-        return arrayOf(processedImage.buffer)
+
+        return PreProcessResult(
+            buffer = arrayOf(processedImage.buffer),
+            letterboxInfo = LetterboxInfo(
+                scale = scale,
+                padX = padX,
+                padY = padY,
+                inputWidth = tensorWidth,
+                inputHeight = tensorHeight
+            )
+        )
     }
+
+    private fun adjustBoxToOriginal(
+        box: Output0,
+        originalWidth: Int,
+        originalHeight: Int,
+        letterboxInfo: LetterboxInfo
+    ): Output0 {
+        fun adjustX(value: Float): Float {
+            val pixel = value * letterboxInfo.inputWidth - letterboxInfo.padX
+            return (pixel / letterboxInfo.scale / originalWidth).coerceIn(0f, 1f)
+        }
+
+        fun adjustY(value: Float): Float {
+            val pixel = value * letterboxInfo.inputHeight - letterboxInfo.padY
+            return (pixel / letterboxInfo.scale / originalHeight).coerceIn(0f, 1f)
+        }
+
+        val newX1 = adjustX(box.x1)
+        val newX2 = adjustX(box.x2)
+        val newY1 = adjustY(box.y1)
+        val newY2 = adjustY(box.y2)
+
+        val newW = newX2 - newX1
+        val newH = newY2 - newY1
+        val newCx = newX1 + newW / 2f
+        val newCy = newY1 + newH / 2f
+
+        return box.copy(
+            x1 = newX1,
+            y1 = newY1,
+            x2 = newX2,
+            y2 = newY2,
+            w = newW,
+            h = newH,
+            cx = newCx,
+            cy = newCy
+        )
+    }
+
+    private data class PreProcessResult(
+        val buffer: Array<ByteBuffer>,
+        val letterboxInfo: LetterboxInfo
+    )
+
+    private data class LetterboxInfo(
+        val scale: Float,
+        val padX: Float,
+        val padY: Float,
+        val inputWidth: Int,
+        val inputHeight: Int
+    )
+
 
     interface InstanceSegmentationListener {
         fun onError(error: String)
