@@ -81,12 +81,12 @@ class InstanceSegmentation(
         if (outputShape1 != null) {
             if (outputShape1[1] == 32) {
                 masksNum = outputShape1[1]
-                xPoints = outputShape1[2]
-                yPoints = outputShape1[3]
+                yPoints = outputShape1[2]
+                xPoints = outputShape1[3]
                 isMaskChannelsFirst = true
             } else {
-                xPoints = outputShape1[1]
-                yPoints = outputShape1[2]
+                yPoints = outputShape1[1]
+                xPoints = outputShape1[2]
                 masksNum = outputShape1[3]
             }
         }
@@ -115,9 +115,9 @@ class InstanceSegmentation(
 
         val maskProtoBuffer = TensorBuffer.createFixedSize(
             if (isMaskChannelsFirst) {
-                intArrayOf(1, masksNum, xPoints, yPoints)
+                intArrayOf(1, masksNum, yPoints, xPoints)
             } else {
-                intArrayOf(1, xPoints, yPoints, masksNum)
+                intArrayOf(1, xPoints, xPoints, masksNum)
             },
             OUTPUT_IMAGE_TYPE
         )
@@ -194,7 +194,7 @@ class InstanceSegmentation(
             List(masksNum) { mask ->
                 Array(yPoints) { y ->
                     FloatArray(xPoints) { x ->
-                        floatArray[(mask * xPoints + x) * yPoints + y]
+                        floatArray[(mask * yPoints + y) * xPoints + x]
                     }
                 }
             }
@@ -202,7 +202,7 @@ class InstanceSegmentation(
             List(masksNum) { mask ->
                 Array(yPoints) { y ->
                     FloatArray(xPoints) { x ->
-                        floatArray[(x * yPoints + y) * masksNum + mask]
+                        floatArray[(y * xPoints + x) * masksNum + mask]
                     }
                 }
             }
