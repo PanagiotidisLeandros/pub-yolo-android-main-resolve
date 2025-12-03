@@ -34,6 +34,7 @@ class InstanceSegmentation(
     private var xPoints = 0
     private var yPoints = 0
     private var masksNum = 0
+    private var isMaskChannelsFirst = false
 
     private val imageProcessor = ImageProcessor.Builder()
         .add(NormalizeOp(INPUT_MEAN, INPUT_STANDARD_DEVIATION))
@@ -82,6 +83,7 @@ class InstanceSegmentation(
                 masksNum = outputShape1[1]
                 xPoints = outputShape1[2]
                 yPoints = outputShape1[3]
+                isMaskChannelsFirst = true
             } else {
                 xPoints = outputShape1[1]
                 yPoints = outputShape1[2]
@@ -112,7 +114,11 @@ class InstanceSegmentation(
         )
 
         val maskProtoBuffer = TensorBuffer.createFixedSize(
-            intArrayOf(1, xPoints, yPoints, masksNum),
+            if (isMaskChannelsFirst) {
+                intArrayOf(1, masksNum, xPoints, yPoints)
+            } else {
+                intArrayOf(1, xPoints, yPoints, masksNum)
+            },
             OUTPUT_IMAGE_TYPE
         )
 
@@ -184,10 +190,20 @@ class InstanceSegmentation(
 
 
     private fun reshapeMaskOutput(floatArray: FloatArray): List<Array<FloatArray>> {
-        return List(masksNum) { mask ->
-            Array(xPoints) { r ->
-                FloatArray(yPoints) { c ->
-                    floatArray[masksNum * yPoints * r + masksNum * c + mask]
+        return if (isMaskChannelsFirst) {
+            List(masksNum) { mask ->
+                Array(yPoints) { y ->
+                    FloatArray(xPoints) { x ->
+                        floatArray[(mask * xPoints + x) * yPoints + y]
+                    }
+                }
+            }
+        } else {
+            List(masksNum) { mask ->
+                Array(yPoints) { y ->
+                    FloatArray(xPoints) { x ->
+                        floatArray[(x * yPoints + y) * masksNum + mask]
+                    }
                 }
             }
         }
