@@ -72,7 +72,11 @@ class ObjectDetectorHelper(
                     currentModel = currentModel,
                     context = context
                 )
-                MODEL_YOLO_SEG -> YoloSegDetector(context)
+                MODEL_YOLO_SEG -> YoloSegDetector(
+                    context = context,
+                    confidenceThreshold = threshold,
+                    maxResults = maxResults
+                )
                 else -> TaskVisionDetector(
                     options = optionsBuilder.build(),
                     currentModel = currentModel,

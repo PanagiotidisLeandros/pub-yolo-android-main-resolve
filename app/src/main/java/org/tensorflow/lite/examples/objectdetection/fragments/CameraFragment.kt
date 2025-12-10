@@ -271,6 +271,10 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
             bitmapBuffer.copyPixelsFromBuffer(image.planes[0].buffer)
         }
         val imageRotation = image.imageInfo.rotationDegrees
+        Log.d(
+            "PreviewDebug",
+            "Analyzer buffer ${image.width}x${image.height}, rotation=$imageRotation"
+        )
         objectDetectorHelper.detect(bitmapBuffer, imageRotation)
     }
 
@@ -285,6 +289,13 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         inferenceTime: Long
     ) {
         activity?.runOnUiThread {
+            Log.d(
+                "UIOverlay",
+                "Result bitmap ${results.image.width}x${results.image.height}, " +
+                    "viewFinder ${fragmentCameraBinding.viewFinder.width}x${fragmentCameraBinding.viewFinder.height}, " +
+                    "ivOverlay ${fragmentCameraBinding.ivOverlay.width}x${fragmentCameraBinding.ivOverlay.height}, " +
+                    "rotation=${fragmentCameraBinding.viewFinder.display.rotation}"
+            )
             if (objectDetectorHelper.currentModel == ObjectDetectorHelper.MODEL_YOLO_SEG) {
                 fragmentCameraBinding.ivOverlay.setImageBitmap(results.image)
             } else {

@@ -67,32 +67,6 @@ class DrawImages(private val context: Context) {
 
         canvas.drawRect(left.toFloat(), top.toFloat(), right.toFloat(), bottom.toFloat(), boxPaint)
 
-        val textBackgroundPaint = Paint().apply {
-            color = ContextCompat.getColor(context, overlayColorResId)
-            style = Paint.Style.FILL
-        }
-
-        val textPaint = Paint().apply {
-            color = Color.WHITE
-            style = Paint.Style.FILL
-            textSize = 16f
-        }
-
-        val bounds = android.graphics.Rect()
-        textPaint.getTextBounds(box.clsName, 0, box.clsName.length, bounds)
-
-        val textWidth = bounds.width()
-        val textHeight = bounds.height()
-        val padding = 2
-
-        canvas.drawRect(
-            left.toFloat(),
-            top.toFloat() - textHeight - 2 * padding,
-            left + textWidth + 2 * padding.toFloat(),
-            top.toFloat(),
-            textBackgroundPaint
-        )
-        canvas.drawText(box.clsName, left.toFloat() + padding, top.toFloat() - padding.toFloat(), textPaint)
     }
 
     private fun applyTransparentOverlayColor(color: Int): Int {
