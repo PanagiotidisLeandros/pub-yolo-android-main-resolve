@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<actions xmlns:android="http://schemas.android.com/apk/res/android">
+    <action
+        android:name="actions.intent.OPEN_APP_FEATURE"
+        android:identifier="OPEN_APP">
+        <intent
+            android:action="android.intent.action.VOICE_COMMAND"
+            android:targetPackage="org.tensorflow.lite.examples.objectdetection"
+            android:targetClass="org.tensorflow.lite.examples.objectdetection.MainActivity">
+            <extra
+                android:name="feature"
+                android:value="open_app" />
+        </intent>
+        <fulfillment>
+            <parameter-mapping
+                intent-parameter="feature"
+                scene-parameter="feature" />
+        </fulfillment>
+    </action>
+</actions>

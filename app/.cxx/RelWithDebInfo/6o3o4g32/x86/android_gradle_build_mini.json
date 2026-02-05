@@ -1,0 +1,27 @@
+{
+  "buildFiles": [
+    "/home/leandros/Desktop/android studio projects/pub-yolo-android-main-resolve/app/src/main/cpp/CMakeLists.txt"
+  ],
+  "cleanCommandsComponents": [
+    [
+      "/home/leandros/Android/Sdk/cmake/3.22.1/bin/ninja",
+      "-C",
+      "/home/leandros/Desktop/android studio projects/pub-yolo-android-main-resolve/app/.cxx/RelWithDebInfo/6o3o4g32/x86",
+      "clean"
+    ]
+  ],
+  "buildTargetsCommandComponents": [
+    "/home/leandros/Android/Sdk/cmake/3.22.1/bin/ninja",
+    "-C",
+    "/home/leandros/Desktop/android studio projects/pub-yolo-android-main-resolve/app/.cxx/RelWithDebInfo/6o3o4g32/x86",
+    "{LIST_OF_TARGETS_TO_BUILD}"
+  ],
+  "libraries": {
+    "image_processing::@6890427a1f51a3e7e1df": {
+      "artifactName": "image_processing",
+      "abi": "x86",
+      "output": "/home/leandros/Desktop/android studio projects/pub-yolo-android-main-resolve/app/build/intermediates/cxx/RelWithDebInfo/6o3o4g32/obj/x86/libimage_processing.so",
+      "runtimeFiles": []
+    }
+  }
+}

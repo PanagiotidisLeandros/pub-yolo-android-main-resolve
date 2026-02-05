@@ -72,6 +72,15 @@ class ObjectDetectorHelper(
                     currentModel = currentModel,
                     context = context
                 )
+                CUSTOM_MODEL -> YoloDetector(
+                    confidenceThreshold = threshold,
+                    iouThreshold = 0.3f,
+                    numThreads = numThreads,
+                    maxResults = maxResults,
+                    currentDelegate = currentDelegate,
+                    currentModel = currentModel,
+                    context = context
+                )
                 MODEL_YOLO_SEG -> YoloSegDetector(
                     context = context,
                     confidenceThreshold = threshold,
@@ -134,5 +143,6 @@ class ObjectDetectorHelper(
         const val MODEL_EFFICIENTDETV2 = 3
         const val MODEL_YOLO = 4
         const val MODEL_YOLO_SEG = 5
+        const val CUSTOM_MODEL = 6
     }
 }

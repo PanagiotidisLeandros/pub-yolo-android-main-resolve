@@ -92,6 +92,10 @@ class CameraFragment : Fragment(), ObjectDetectorHelper.DetectorListener {
         bottomSheetBehavior.isDraggable = false
         bottomSheetBehavior.state = BottomSheetBehavior.STATE_HIDDEN
 
+        fragmentCameraBinding.toggleOptionsButton.setOnTouchListener { _, _ ->
+             //Consume manual touch events so only accessibility/voice can trigger clicks.
+                true
+       }
         fragmentCameraBinding.toggleOptionsButton.setOnClickListener {
             toggleOptionsPanel(bottomSheetBehavior)
         }

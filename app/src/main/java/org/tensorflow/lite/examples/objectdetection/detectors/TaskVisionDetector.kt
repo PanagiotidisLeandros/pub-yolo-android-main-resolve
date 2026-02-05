@@ -1,6 +1,8 @@
 package org.tensorflow.lite.examples.objectdetection.detectors
 
 import android.content.Context
+import org.tensorflow.lite.examples.objectdetection.DistanceCalculator
+import org.tensorflow.lite.examples.objectdetection.DistanceEstimator
 import org.tensorflow.lite.examples.objectdetection.ObjectDetectorHelper.Companion.MODEL_EFFICIENTDETV0
 import org.tensorflow.lite.examples.objectdetection.ObjectDetectorHelper.Companion.MODEL_EFFICIENTDETV1
 import org.tensorflow.lite.examples.objectdetection.ObjectDetectorHelper.Companion.MODEL_EFFICIENTDETV2
@@ -18,6 +20,16 @@ class TaskVisionDetector(
     ): org.tensorflow.lite.examples.objectdetection.detectors.ObjectDetector {
 
     private var objectDetector: ObjectDetector
+    private val distanceCalculator = DistanceCalculator(context!!)
+
+    private val distanceEstimator = DistanceEstimator(
+        cameraHeight = 1.3,
+        verticalFov = 62.0
+    )
+
+    private var phoneZenithAngleRad: Float = 0f
+
+    private var originalImageHeight: Int = 0
 
     init {
 
@@ -29,9 +41,21 @@ class TaskVisionDetector(
                 MODEL_EFFICIENTDETV2 -> "efficientdet-lite2.tflite"
                 else -> "mobilenetv1.tflite"
             }
+        distanceCalculator.setAngleListener { angleRad ->
+            phoneZenithAngleRad = angleRad
+            //postInvalidate()   // trigger redraw when angle changes
+        }
 
         objectDetector = ObjectDetector.createFromFileAndOptions(context, modelName, options)
 
+    }
+
+    fun registerSensorListener() {
+        distanceCalculator.registerSensorListener()
+    }
+
+    fun unregisterSensorListener() {
+        distanceCalculator.unregisterSensorListener()
     }
 
     override fun detect(tensorImage: TensorImage, imageRotation: Int): DetectionResult {

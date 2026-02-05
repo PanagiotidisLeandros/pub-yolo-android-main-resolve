@@ -1,0 +1,1 @@
+C:\Users\leand\Desktop\android studio final\pub-yolo-android-main-resolve\app\src\main\cpp\CMakeLists.txt

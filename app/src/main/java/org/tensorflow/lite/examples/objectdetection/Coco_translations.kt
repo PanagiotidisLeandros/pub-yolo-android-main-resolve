@@ -79,7 +79,16 @@ class coco_translations {
             "nightstand" to "κομοδίνο",
             "curtain" to "κουρτίνα",
             "book" to "βιβλίο",
-            "clock" to "ρολόι"
+            "clock" to "ρολόι",
+            "Couch" to "καναπές",
+            "bottle cap" to "καπάκι",
+            "open bottle" to "ανοιχτό μπουκάλι",
+            "door" to "πόρτα",
+            "shelf" to "ράφι",
+            "stairs" to "σκάλες",
+            "switch" to "διακόπτης",
+            "table" to "τραπέζι",
+            "television" to "τηλεόραση"
         )
     }
 }

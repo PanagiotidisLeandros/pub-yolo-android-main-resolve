@@ -1,0 +1,7 @@
+[
+{
+  "directory": "C:/Users/leand/Desktop/pub-yolo-android-main-resolve/app/.cxx/Debug/22234535/armeabi-v7a",
+  "command": "C:\\Users\\leand\\AppData\\Local\\Android\\Sdk\\ndk\\23.1.7779620\\toolchains\\llvm\\prebuilt\\windows-x86_64\\bin\\clang++.exe --target=armv7-none-linux-androideabi26 --gcc-toolchain=C:/Users/leand/AppData/Local/Android/Sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/windows-x86_64 --sysroot=C:/Users/leand/AppData/Local/Android/Sdk/ndk/23.1.7779620/toolchains/llvm/prebuilt/windows-x86_64/sysroot -Dimage_processing_EXPORTS -IC:/Users/leand/AppData/Local/Android/Sdk/ndk/23.1.7779620/sources/android/cpufeatures -g -DANDROID -fdata-sections -ffunction-sections -funwind-tables -fstack-protector-strong -no-canonical-prefixes -D_FORTIFY_SOURCE=2 -march=armv7-a -mthumb -Wformat -Werror=format-security   -fno-limit-debug-info  -fPIC -o CMakeFiles\\image_processing.dir\\image_processing.cpp.o -c C:\\Users\\leand\\Desktop\\pub-yolo-android-main-resolve\\app\\src\\main\\cpp\\image_processing.cpp",
+  "file": "C:\\Users\\leand\\Desktop\\pub-yolo-android-main-resolve\\app\\src\\main\\cpp\\image_processing.cpp"
+}
+]

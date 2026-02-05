@@ -1,0 +1,39 @@
+description: Ultralytics YOLO11n model trained on Indoor-Detection-1/data.yaml
+author: Ultralytics
+date: '2026-01-12T13:42:59.381733'
+version: 8.3.252
+license: AGPL-3.0 License (https://ultralytics.com/license)
+docs: https://docs.ultralytics.com
+stride: 32
+task: detect
+batch: 1
+imgsz:
+- 640
+- 640
+names:
+  0: '0'
+  1: Cat
+  2: Couch
+  3: Dog
+  4: bottle cap
+  5: chair
+  6: cup
+  7: object
+  8: open bottle
+  9: person
+  10: door
+  11: refrigerator
+  12: shelf
+  13: stairs
+  14: switch
+  15: table
+  16: table
+  17: television
+  18: undefined
+args:
+  batch: 1
+  fraction: 1.0
+  half: false
+  int8: false
+  nms: false
+channels: 3

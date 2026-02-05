@@ -1,0 +1,1 @@
+/home/leandros/Desktop/android studio projects/pub-yolo-android-main-resolve/app/build/intermediates/cxx/RelWithDebInfo/6o3o4g32/obj/x86

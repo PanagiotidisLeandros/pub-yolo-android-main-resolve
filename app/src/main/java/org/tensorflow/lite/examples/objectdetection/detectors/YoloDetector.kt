@@ -6,6 +6,7 @@ import com.ultralytics.yolo.ImageProcessing
 import com.ultralytics.yolo.models.LocalYoloModel
 import com.ultralytics.yolo.predict.detect.DetectedObject
 import com.ultralytics.yolo.predict.detect.TfliteDetector
+import org.tensorflow.lite.examples.objectdetection.ObjectDetectorHelper
 import org.tensorflow.lite.support.image.TensorImage
 
 
@@ -30,8 +31,27 @@ class YoloDetector(
 
         // val modelPath = "YOLO11n-catsdogs_float32.tflite"
         // val metadataPath = "metadata-catsdogs.yaml"
-        val modelPath = "yolo11n_float32.tflite"
-        val metadataPath = "metadata.yaml"
+
+        //val modelPath = "yolo11n_float32.tflite"
+        //val metadataPath = "metadata.yaml"
+
+        //val modelPath = "my_model_float32.tflite"
+        //val modelPath = "best_float32.tflite"
+
+
+        val (modelPath, metadataPath) = when (currentModel) {
+            ObjectDetectorHelper.MODEL_YOLO -> {
+                "yolo11n_float32.tflite" to "metadata.yaml"
+            }
+
+            ObjectDetectorHelper.CUSTOM_MODEL -> {
+                "best_float32.tflite" to "metadata2.yaml"
+            }
+
+            else -> {
+                throw IllegalArgumentException("Unsupported YOLO model: $currentModel")
+            }
+        }
 
         val config = LocalYoloModel(
             "detect",
